@@ -13,6 +13,10 @@
   --muted: rgba(229, 232, 240, 0.58);
   --accent: #9d8cff;
   --accent-2: #65d7ff;
+  --status-ok: #78e6ad;
+  --status-issue: #f5c96a;
+  --status-down: #ff7c88;
+  --status-unknown: #aeb5c2;
 }
 
 * {
@@ -34,7 +38,8 @@ button {
   font: inherit;
 }
 
-button:focus-visible {
+button:focus-visible,
+a:focus-visible {
   outline: 2px solid rgba(157, 140, 255, 0.9);
   outline-offset: 4px;
 }
@@ -162,6 +167,220 @@ button:focus-visible {
   color: #d4ceff;
 }
 
+.status-widget {
+  position: fixed;
+  top: 22px;
+  right: 22px;
+  z-index: 12;
+  width: min(340px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.status-trigger {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  background: rgba(13, 16, 24, 0.73);
+  backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  color: rgba(245, 247, 252, 0.84);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.24);
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 760;
+  letter-spacing: 0.095em;
+  transition: border-color 170ms ease, background 170ms ease, color 170ms ease;
+}
+
+.status-trigger:hover {
+  color: #fff;
+  background: rgba(20, 23, 34, 0.84);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.status-trigger-ok {
+  border-color: rgba(120, 230, 173, 0.18);
+}
+
+.status-trigger-issue,
+.status-trigger-down {
+  border-color: rgba(245, 201, 106, 0.28);
+}
+
+.status-trigger-down {
+  border-color: rgba(255, 124, 136, 0.32);
+}
+
+.status-indicator {
+  width: 25px;
+  height: 25px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  color: var(--status-unknown);
+  background: rgba(174, 181, 194, 0.08);
+}
+
+.status-trigger-ok .status-indicator {
+  color: var(--status-ok);
+  background: rgba(120, 230, 173, 0.09);
+}
+
+.status-trigger-issue .status-indicator {
+  color: var(--status-issue);
+  background: rgba(245, 201, 106, 0.1);
+  animation: statusPulse 3.2s ease-in-out infinite;
+}
+
+.status-trigger-down .status-indicator {
+  color: var(--status-down);
+  background: rgba(255, 124, 136, 0.11);
+  animation: statusPulse 2.6s ease-in-out infinite;
+}
+
+.status-chevron {
+  margin-left: 1px;
+  color: rgba(231, 234, 242, 0.38);
+  transition: transform 180ms ease;
+}
+
+.status-chevron-open {
+  transform: rotate(180deg);
+}
+
+.status-spin {
+  animation: spin 0.9s linear infinite;
+}
+
+.status-panel {
+  width: 100%;
+  overflow: hidden;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 19px;
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, 0.045), transparent 42%),
+    rgba(13, 16, 24, 0.91);
+  backdrop-filter: blur(24px) saturate(145%);
+  -webkit-backdrop-filter: blur(24px) saturate(145%);
+  box-shadow: 0 20px 54px rgba(0, 0, 0, 0.36);
+}
+
+.status-panel-heading,
+.status-service {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.status-panel-heading > span:first-child {
+  color: #f3f5fa;
+  font-size: 0.9rem;
+  font-weight: 680;
+  letter-spacing: -0.015em;
+}
+
+.status-divider {
+  height: 1px;
+  margin: 13px 0;
+  background: rgba(255, 255, 255, 0.075);
+}
+
+.status-service > div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.status-service strong {
+  color: #f4f6fb;
+  font-size: 0.92rem;
+  line-height: 1;
+  font-weight: 690;
+}
+
+.status-service > div > span {
+  color: rgba(222, 226, 236, 0.42);
+  font-size: 0.7rem;
+  line-height: 1.2;
+}
+
+.status-pill {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: 27px;
+  padding: 0 9px;
+  border: 1px solid rgba(174, 181, 194, 0.12);
+  border-radius: 999px;
+  color: var(--status-unknown);
+  background: rgba(174, 181, 194, 0.06);
+  font-size: 0.68rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.status-pill.status-operational {
+  color: var(--status-ok);
+  border-color: rgba(120, 230, 173, 0.15);
+  background: rgba(120, 230, 173, 0.07);
+}
+
+.status-pill.status-degraded,
+.status-pill.status-maintenance {
+  color: var(--status-issue);
+  border-color: rgba(245, 201, 106, 0.17);
+  background: rgba(245, 201, 106, 0.075);
+}
+
+.status-pill.status-downtime {
+  color: var(--status-down);
+  border-color: rgba(255, 124, 136, 0.18);
+  background: rgba(255, 124, 136, 0.075);
+}
+
+.status-warning {
+  margin-top: 13px;
+  padding: 10px 11px;
+  border: 1px solid rgba(245, 201, 106, 0.13);
+  border-radius: 12px;
+  color: rgba(245, 214, 148, 0.78);
+  background: rgba(245, 201, 106, 0.055);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.status-panel-footer {
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  color: rgba(220, 224, 234, 0.34);
+  font-size: 0.67rem;
+}
+
+.status-panel-footer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: rgba(204, 198, 255, 0.7);
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.status-panel-footer a:hover {
+  color: #ddd8ff;
+}
+
 .site-footer {
   position: absolute;
   left: 50%;
@@ -256,6 +475,15 @@ button:focus-visible {
   to { transform: translate3d(4%, 6%, 0) scale(1.08); }
 }
 
+@keyframes statusPulse {
+  0%, 72%, 100% { box-shadow: 0 0 0 0 rgba(245, 201, 106, 0); }
+  84% { box-shadow: 0 0 0 5px rgba(245, 201, 106, 0.07); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 @media (max-width: 620px) {
   .home {
     width: min(100% - 24px, 520px);
@@ -274,6 +502,22 @@ button:focus-visible {
 
   .server-name {
     font-size: clamp(3.1rem, 20vw, 5.2rem);
+  }
+
+  .status-widget {
+    top: 12px;
+    right: 12px;
+    width: min(328px, calc(100vw - 24px));
+  }
+
+  .status-trigger {
+    min-height: 39px;
+    border-radius: 13px;
+  }
+
+  .status-panel {
+    padding: 14px;
+    border-radius: 17px;
   }
 }
 
