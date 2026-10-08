@@ -104,7 +104,7 @@ button:focus-visible {
   display: grid;
   gap: clamp(38px, 7vw, 64px);
   place-items: center;
-  padding: 44px 0 110px;
+  padding: 44px 0;
 }
 
 .server-name {
@@ -646,7 +646,6 @@ button:focus-visible {
   .home {
     width: min(100% - 24px, 520px);
     gap: 44px;
-    padding-bottom: 122px;
   }
 
   .actions {
