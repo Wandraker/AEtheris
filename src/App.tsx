@@ -17,11 +17,14 @@ type Panel = 'map' | 'rules' | 'faq' | 'recipes' | null
 type ServiceState = 'operational' | 'degraded' | 'downtime' | 'maintenance' | 'not_monitored' | 'unknown'
 
 type BetterStackResource = {
+  id?: string
   type?: string
   attributes?: {
     public_name?: string
+    name?: string
     status?: string
     availability?: number
+    status_page_section_id?: string | number
   }
 }
 
@@ -70,6 +73,13 @@ function normalizeStatus(value?: string): ServiceState {
   }
 }
 
+function sectionLabel(name?: string) {
+  if (!name) return null
+
+  const match = name.match(/Nodes\s+—\s+([^〔]+)/i)
+  return match?.[1]?.trim() || name.trim()
+}
+
 function severityOf(state: ServiceState) {
   switch (state) {
     case 'downtime':
@@ -90,6 +100,7 @@ function App() {
   const [statusOpen, setStatusOpen] = useState(false)
   const [hostStatus, setHostStatus] = useState<ServiceState>('unknown')
   const [laneStatus, setLaneStatus] = useState<ServiceState>('unknown')
+  const [nodeRegion, setNodeRegion] = useState<string | null>(null)
   const [statusLoading, setStatusLoading] = useState(true)
   const [statusError, setStatusError] = useState(false)
   const [lastUpdated, setLastUpdated] = useState<string | null>(null)
@@ -138,8 +149,15 @@ function App() {
           return resource.attributes?.public_name?.trim().toUpperCase().startsWith('DELTA-1') ?? false
         })
 
+        const sectionId = laneResource?.attributes?.status_page_section_id
+        const laneSection = payload.included?.find((resource) => {
+          if (resource.type !== 'status_page_section') return false
+          return sectionId != null && String(resource.id) === String(sectionId)
+        })
+
         setHostStatus(nextHostStatus)
         setLaneStatus(normalizeStatus(laneResource?.attributes?.status))
+        setNodeRegion(sectionLabel(laneSection?.attributes?.name))
         setLastUpdated(payload.data?.attributes?.updated_at ?? new Date().toISOString())
         setStatusError(false)
       } catch {
@@ -248,7 +266,7 @@ function App() {
               <div className="status-service">
                 <div>
                   <strong>DELTA-1</strong>
-                  <span>eu.central</span>
+                  <span>{nodeRegion ?? '—'}</span>
                 </div>
                 <span className={'status-pill status-' + laneStatus}>{statusLabels[laneStatus]}</span>
               </div>
