@@ -5,7 +5,6 @@ import {
   Check,
   ChevronDown,
   CircleHelp,
-  ExternalLink,
   LoaderCircle,
   Map,
   ScrollText,
@@ -34,7 +33,6 @@ type BetterStackPayload = {
   included?: BetterStackResource[]
 }
 
-const STATUS_URL = 'https://status.hyprr.space/'
 const STATUS_JSON_URL = 'https://status.hyprr.space/index.json'
 
 const panelTitles: Record<Exclude<Panel, null>, string> = {
@@ -255,10 +253,6 @@ function App() {
 
               <div className="status-panel-footer">
                 <span>{updatedText ? 'Обновлено ' + updatedText : 'Автообновление'}</span>
-                <a href={STATUS_URL} target="_blank" rel="noreferrer">
-                  Подробнее
-                  <ExternalLink size={13} aria-hidden="true" />
-                </a>
               </div>
             </motion.div>
           )}

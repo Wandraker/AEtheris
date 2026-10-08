@@ -38,8 +38,7 @@ button {
   font: inherit;
 }
 
-button:focus-visible,
-a:focus-visible {
+button:focus-visible {
   outline: 2px solid rgba(157, 140, 255, 0.9);
   outline-offset: 4px;
 }
@@ -360,25 +359,8 @@ a:focus-visible {
 
 .status-panel-footer {
   margin-top: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
   color: rgba(220, 224, 234, 0.34);
   font-size: 0.67rem;
-}
-
-.status-panel-footer a {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: rgba(204, 198, 255, 0.7);
-  text-decoration: none;
-  transition: color 160ms ease;
-}
-
-.status-panel-footer a:hover {
-  color: #ddd8ff;
 }
 
 .site-footer {
