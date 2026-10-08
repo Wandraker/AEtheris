@@ -39,6 +39,7 @@ type BetterStackPayload = {
 }
 
 const STATUS_JSON_URL = 'https://status.hyprr.space/index.json'
+const BLUEMAP_URL = 'https://delta-1.ru-west.hyprr.space:15127/'
 
 const panelTitles: Record<Exclude<Panel, null>, string> = {
   map: 'Онлайн-карта',
@@ -104,8 +105,10 @@ function App() {
   const [statusLoading, setStatusLoading] = useState(true)
   const [statusError, setStatusError] = useState(false)
   const [lastUpdated, setLastUpdated] = useState<string | null>(null)
+  const [mapLoaded, setMapLoaded] = useState(false)
 
   useEffect(() => {
+    if (panel === 'map') setMapLoaded(false)
     if (!panel) return
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -406,7 +409,7 @@ function App() {
             }}
           >
             <motion.section
-              className="modal"
+              className={panel === 'map' ? 'modal modal-map' : 'modal'}
               role="dialog"
               aria-modal="true"
               aria-labelledby="modal-title"
@@ -424,8 +427,33 @@ function App() {
                 <X size={20} />
               </button>
 
-              <h2 id="modal-title">{panelTitles[panel]}</h2>
-              <p>Пока ничего нет</p>
+              {panel === 'map' ? (
+                <>
+                  <div className="map-modal-header">
+                    <h2 id="modal-title">{panelTitles[panel]}</h2>
+                  </div>
+                  <div className="map-frame-shell">
+                    {!mapLoaded && (
+                      <div className="map-loading" aria-live="polite">
+                        <LoaderCircle size={22} className="status-spin" aria-hidden="true" />
+                        <span>Загрузка карты</span>
+                      </div>
+                    )}
+                    <iframe
+                      className={mapLoaded ? 'map-frame map-frame-loaded' : 'map-frame'}
+                      src={BLUEMAP_URL}
+                      title="Онлайн-карта AEtheris"
+                      onLoad={() => setMapLoaded(true)}
+                      allowFullScreen
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h2 id="modal-title">{panelTitles[panel]}</h2>
+                  <p>Пока ничего нет</p>
+                </>
+              )}
             </motion.section>
           </motion.div>
         )}
