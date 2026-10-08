@@ -7,13 +7,15 @@ import {
   ChevronDown,
   ChevronRight,
   CircleHelp,
+  Copy,
   LoaderCircle,
   Map,
   ScrollText,
+  Server,
   X,
 } from 'lucide-react'
 
-type Panel = 'map' | 'rules' | 'faq' | 'recipes' | null
+type Panel = 'map' | 'rules' | 'faq' | 'recipes' | 'connect' | null
 type ServiceState = 'operational' | 'degraded' | 'downtime' | 'maintenance' | 'not_monitored' | 'unknown'
 
 type BetterStackResource = {
@@ -45,6 +47,7 @@ const panelTitles: Record<Exclude<Panel, null>, string> = {
   rules: 'Правила',
   faq: 'ЧаВо',
   recipes: 'Рецепты',
+  connect: 'Подключение',
 }
 
 const statusLabels: Record<ServiceState, string> = {
@@ -104,6 +107,7 @@ function App() {
   const [statusLoading, setStatusLoading] = useState(true)
   const [statusError, setStatusError] = useState(false)
   const [lastUpdated, setLastUpdated] = useState<string | null>(null)
+  const [copiedField, setCopiedField] = useState<'java' | 'bedrock-address' | 'bedrock-port' | null>(null)
 
   useEffect(() => {
     if (!panel) return
@@ -218,6 +222,29 @@ function App() {
 
   const scrollToMore = () => {
     document.getElementById('more')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  const copyConnection = async (
+    value: string,
+    field: 'java' | 'bedrock-address' | 'bedrock-port',
+  ) => {
+    try {
+      await navigator.clipboard.writeText(value)
+    } catch {
+      const textarea = document.createElement('textarea')
+      textarea.value = value
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      textarea.remove()
+    }
+
+    setCopiedField(field)
+    window.setTimeout(() => {
+      setCopiedField((current) => (current === field ? null : current))
+    }, 1400)
   }
 
   return (
@@ -351,6 +378,7 @@ function App() {
           <span className="secondary-track-line" />
           <span className="secondary-track-dot secondary-track-dot-one" />
           <span className="secondary-track-dot secondary-track-dot-two" />
+          <span className="secondary-track-dot secondary-track-dot-three" />
         </div>
 
         <div className="secondary-nodes">
@@ -389,6 +417,24 @@ function App() {
             <span className="secondary-node-title">Рецепты</span>
             <ChevronRight className="secondary-node-arrow" size={18} aria-hidden="true" />
           </motion.button>
+
+          <motion.button
+            className="secondary-node secondary-node-left"
+            type="button"
+            onClick={() => setPanel('connect')}
+            initial={{ opacity: 0, x: -28, y: 14 }}
+            whileInView={{ opacity: 1, x: 0, y: 0 }}
+            viewport={{ once: true, amount: 0.45 }}
+            transition={{ delay: 0.16, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ x: 6 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <span className="secondary-node-icon" aria-hidden="true">
+              <Server size={25} strokeWidth={1.7} />
+            </span>
+            <span className="secondary-node-title">Подключение</span>
+            <ChevronRight className="secondary-node-arrow" size={18} aria-hidden="true" />
+          </motion.button>
         </div>
       </section>
 
@@ -406,7 +452,7 @@ function App() {
             }}
           >
             <motion.section
-              className="modal"
+              className={panel === 'connect' ? 'modal modal-connect' : 'modal'}
               role="dialog"
               aria-modal="true"
               aria-labelledby="modal-title"
@@ -425,7 +471,56 @@ function App() {
               </button>
 
               <h2 id="modal-title">{panelTitles[panel]}</h2>
-              <p>Пока ничего нет</p>
+
+              {panel === 'connect' ? (
+                <div className="connection-content">
+                  <section className="connection-group">
+                    <div className="connection-platform">Java</div>
+                    <button
+                      className="connection-copy connection-copy-wide"
+                      type="button"
+                      onClick={() => void copyConnection('31.177.109.245:15124', 'java')}
+                    >
+                      <span className="connection-value">31.177.109.245:15124</span>
+                      <span className={copiedField === 'java' ? 'copy-state copy-state-active' : 'copy-state'}>
+                        {copiedField === 'java' ? <Check size={16} /> : <Copy size={16} />}
+                        <span>{copiedField === 'java' ? 'Скопировано' : 'Копировать'}</span>
+                      </span>
+                    </button>
+                  </section>
+
+                  <section className="connection-group">
+                    <div className="connection-platform">Bedrock</div>
+                    <div className="connection-grid">
+                      <button
+                        className="connection-copy"
+                        type="button"
+                        onClick={() => void copyConnection('31.177.109.245', 'bedrock-address')}
+                      >
+                        <span className="connection-label">Адрес</span>
+                        <span className="connection-value">31.177.109.245</span>
+                        <span className={copiedField === 'bedrock-address' ? 'copy-icon copy-icon-active' : 'copy-icon'}>
+                          {copiedField === 'bedrock-address' ? <Check size={16} /> : <Copy size={16} />}
+                        </span>
+                      </button>
+
+                      <button
+                        className="connection-copy"
+                        type="button"
+                        onClick={() => void copyConnection('15126', 'bedrock-port')}
+                      >
+                        <span className="connection-label">Порт</span>
+                        <span className="connection-value">15126</span>
+                        <span className={copiedField === 'bedrock-port' ? 'copy-icon copy-icon-active' : 'copy-icon'}>
+                          {copiedField === 'bedrock-port' ? <Check size={16} /> : <Copy size={16} />}
+                        </span>
+                      </button>
+                    </div>
+                  </section>
+                </div>
+              ) : (
+                <p>Пока ничего нет</p>
+              )}
             </motion.section>
           </motion.div>
         )}
