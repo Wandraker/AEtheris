@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import {
   AlertTriangle,
+  BookOpen,
   Check,
   ChevronDown,
+  ChevronRight,
   CircleHelp,
   LoaderCircle,
   Map,
@@ -11,7 +13,7 @@ import {
   X,
 } from 'lucide-react'
 
-type Panel = 'map' | 'rules' | null
+type Panel = 'map' | 'rules' | 'faq' | 'recipes' | null
 type ServiceState = 'operational' | 'degraded' | 'downtime' | 'maintenance' | 'not_monitored' | 'unknown'
 
 type BetterStackResource = {
@@ -38,6 +40,8 @@ const STATUS_JSON_URL = 'https://status.hyprr.space/index.json'
 const panelTitles: Record<Exclude<Panel, null>, string> = {
   map: 'Онлайн-карта',
   rules: 'Правила',
+  faq: 'ЧаВо',
+  recipes: 'Рецепты',
 }
 
 const statusLabels: Record<ServiceState, string> = {
@@ -194,6 +198,10 @@ function App() {
     return <AlertTriangle size={15} strokeWidth={2.2} aria-hidden="true" />
   }
 
+  const scrollToMore = () => {
+    document.getElementById('more')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   return (
     <main className="site-shell">
       <div className="ambient ambient-one" aria-hidden="true" />
@@ -259,51 +267,112 @@ function App() {
         </AnimatePresence>
       </aside>
 
-      <motion.section
-        className="home"
-        initial={{ opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <motion.h1
-          className="server-name"
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.08, duration: 0.55 }}
+      <section className="hero-screen">
+        <motion.div
+          className="home"
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
         >
-          AEtheris
-        </motion.h1>
+          <motion.h1
+            className="server-name"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.08, duration: 0.55 }}
+          >
+            AEtheris
+          </motion.h1>
 
-        <nav className="actions" aria-label="Разделы сайта">
+          <nav className="actions" aria-label="Основные разделы сайта">
+            <motion.button
+              className="action-card"
+              type="button"
+              onClick={() => setPanel('map')}
+              whileHover={{ y: -4, scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <span className="icon-wrap" aria-hidden="true">
+                <Map size={24} strokeWidth={1.8} />
+              </span>
+              <span>Онлайн-карта</span>
+            </motion.button>
+
+            <motion.button
+              className="action-card"
+              type="button"
+              onClick={() => setPanel('rules')}
+              whileHover={{ y: -4, scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <span className="icon-wrap" aria-hidden="true">
+                <ScrollText size={24} strokeWidth={1.8} />
+              </span>
+              <span>Правила</span>
+            </motion.button>
+          </nav>
+        </motion.div>
+
+        <motion.button
+          className="scroll-cue"
+          type="button"
+          aria-label="К дополнительным разделам"
+          onClick={scrollToMore}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.9, duration: 0.5 }}
+        >
+          <span className="scroll-cue-line" aria-hidden="true" />
+          <ChevronDown size={18} aria-hidden="true" />
+        </motion.button>
+
+        <footer className="site-footer">© 2026 AEtheris. All rights reserved.</footer>
+      </section>
+
+      <section id="more" className="secondary-screen" aria-label="Дополнительные разделы">
+        <div className="secondary-track" aria-hidden="true">
+          <span className="secondary-track-line" />
+          <span className="secondary-track-dot secondary-track-dot-one" />
+          <span className="secondary-track-dot secondary-track-dot-two" />
+        </div>
+
+        <div className="secondary-nodes">
           <motion.button
-            className="action-card"
+            className="secondary-node secondary-node-left"
             type="button"
-            onClick={() => setPanel('map')}
-            whileHover={{ y: -4, scale: 1.01 }}
+            onClick={() => setPanel('faq')}
+            initial={{ opacity: 0, x: -28, y: 14 }}
+            whileInView={{ opacity: 1, x: 0, y: 0 }}
+            viewport={{ once: true, amount: 0.45 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ x: 6 }}
             whileTap={{ scale: 0.98 }}
           >
-            <span className="icon-wrap" aria-hidden="true">
-              <Map size={24} strokeWidth={1.8} />
+            <span className="secondary-node-icon" aria-hidden="true">
+              <CircleHelp size={25} strokeWidth={1.7} />
             </span>
-            <span>Онлайн-карта</span>
+            <span className="secondary-node-title">ЧаВо</span>
+            <ChevronRight className="secondary-node-arrow" size={18} aria-hidden="true" />
           </motion.button>
 
           <motion.button
-            className="action-card"
+            className="secondary-node secondary-node-right"
             type="button"
-            onClick={() => setPanel('rules')}
-            whileHover={{ y: -4, scale: 1.01 }}
+            onClick={() => setPanel('recipes')}
+            initial={{ opacity: 0, x: 28, y: 14 }}
+            whileInView={{ opacity: 1, x: 0, y: 0 }}
+            viewport={{ once: true, amount: 0.45 }}
+            transition={{ delay: 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ x: -6 }}
             whileTap={{ scale: 0.98 }}
           >
-            <span className="icon-wrap" aria-hidden="true">
-              <ScrollText size={24} strokeWidth={1.8} />
+            <span className="secondary-node-icon" aria-hidden="true">
+              <BookOpen size={25} strokeWidth={1.7} />
             </span>
-            <span>Правила</span>
+            <span className="secondary-node-title">Рецепты</span>
+            <ChevronRight className="secondary-node-arrow" size={18} aria-hidden="true" />
           </motion.button>
-        </nav>
-      </motion.section>
-
-      <footer className="site-footer">© 2026 AEtheris. All rights reserved.</footer>
+        </div>
+      </section>
 
       <AnimatePresence>
         {panel && (
