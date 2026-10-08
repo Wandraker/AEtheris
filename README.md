@@ -1,2 +1,1 @@
-# AEtheris
-Site-Repository
+© 2026 AEtheris. All rights reserved.

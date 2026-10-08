@@ -1,0 +1,288 @@
+@import "tailwindcss";
+
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #f7f8fb;
+  background: #080a10;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --surface: rgba(19, 22, 32, 0.68);
+  --surface-strong: rgba(19, 22, 32, 0.9);
+  --border: rgba(255, 255, 255, 0.11);
+  --muted: rgba(229, 232, 240, 0.58);
+  --accent: #9d8cff;
+  --accent-2: #65d7ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: #080a10;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #080a10;
+}
+
+button {
+  font: inherit;
+}
+
+button:focus-visible {
+  outline: 2px solid rgba(157, 140, 255, 0.9);
+  outline-offset: 4px;
+}
+
+.site-shell {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 50% 120%, rgba(94, 74, 219, 0.12), transparent 38%),
+    linear-gradient(180deg, #0a0c12 0%, #07090e 100%);
+}
+
+.grid-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  opacity: 0.16;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(circle at center, black 12%, transparent 72%);
+}
+
+.ambient {
+  position: absolute;
+  z-index: -1;
+  width: min(60vw, 760px);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  filter: blur(90px);
+  opacity: 0.17;
+  pointer-events: none;
+  animation: float 13s ease-in-out infinite alternate;
+}
+
+.ambient-one {
+  top: -28%;
+  left: -12%;
+  background: #7762ff;
+}
+
+.ambient-two {
+  right: -18%;
+  bottom: -30%;
+  background: #3bbee9;
+  animation-delay: -6s;
+}
+
+.home {
+  width: min(100% - 32px, 780px);
+  display: grid;
+  gap: clamp(38px, 7vw, 64px);
+  place-items: center;
+  padding: 44px 0;
+}
+
+.server-name {
+  margin: 0;
+  font-size: clamp(3.15rem, 11vw, 6.8rem);
+  line-height: 0.95;
+  letter-spacing: -0.07em;
+  font-weight: 760;
+  background: linear-gradient(115deg, #ffffff 12%, #d8d5ff 52%, #b4efff 95%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 52px rgba(150, 135, 255, 0.11);
+  user-select: none;
+}
+
+.actions {
+  width: min(100%, 600px);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.action-card {
+  appearance: none;
+  min-height: 94px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.015)),
+    var(--surface);
+  backdrop-filter: blur(18px) saturate(130%);
+  -webkit-backdrop-filter: blur(18px) saturate(130%);
+  color: #f6f7fb;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+  padding: 20px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 640;
+  letter-spacing: -0.015em;
+  box-shadow: 0 16px 60px rgba(0, 0, 0, 0.22);
+  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+}
+
+.action-card:hover {
+  border-color: rgba(178, 168, 255, 0.35);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
+    rgba(21, 24, 36, 0.76);
+  box-shadow: 0 18px 70px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(157, 140, 255, 0.04) inset;
+}
+
+.icon-wrap {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.045);
+  color: #d4ceff;
+}
+
+.site-footer {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  text-align: center;
+  color: rgba(229, 232, 240, 0.38);
+  font-size: 0.76rem;
+  letter-spacing: 0.01em;
+  user-select: none;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(3, 4, 8, 0.67);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.modal {
+  position: relative;
+  width: min(100%, 430px);
+  min-height: 240px;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  gap: 10px;
+  padding: 58px 34px 46px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 28px;
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, 0.06), transparent 45%),
+    var(--surface-strong);
+  box-shadow: 0 32px 100px rgba(0, 0, 0, 0.5);
+}
+
+.modal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 0%, rgba(157, 140, 255, 0.11), transparent 44%);
+}
+
+.modal h2 {
+  position: relative;
+  margin: 0;
+  font-size: clamp(1.45rem, 5vw, 1.8rem);
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+  font-weight: 710;
+}
+
+.modal p {
+  position: relative;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.98rem;
+}
+
+.close-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.68);
+  cursor: pointer;
+  transition: color 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.close-button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.075);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+@keyframes float {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(4%, 6%, 0) scale(1.08); }
+}
+
+@media (max-width: 620px) {
+  .home {
+    width: min(100% - 24px, 520px);
+    gap: 44px;
+  }
+
+  .actions {
+    grid-template-columns: 1fr;
+    gap: 11px;
+  }
+
+  .action-card {
+    min-height: 82px;
+    border-radius: 20px;
+  }
+
+  .server-name {
+    font-size: clamp(3.1rem, 20vw, 5.2rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
