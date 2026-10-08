@@ -135,7 +135,7 @@ function App() {
         const nextHostStatus = normalizeStatus(payload.data?.attributes?.aggregate_state)
         const laneResource = payload.included?.find((resource) => {
           if (resource.type !== 'status_page_resource') return false
-          return resource.attributes?.public_name?.trim().toUpperCase().startsWith('LANE-1') ?? false
+          return resource.attributes?.public_name?.trim().toUpperCase().startsWith('DELTA-1') ?? false
         })
 
         setHostStatus(nextHostStatus)
@@ -247,7 +247,7 @@ function App() {
 
               <div className="status-service">
                 <div>
-                  <strong>LANE-1</strong>
+                  <strong>DELTA-1</strong>
                   <span>eu.central</span>
                 </div>
                 <span className={'status-pill status-' + laneStatus}>{statusLabels[laneStatus]}</span>
