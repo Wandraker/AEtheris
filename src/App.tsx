@@ -41,6 +41,7 @@ type BetterStackPayload = {
 }
 
 const STATUS_JSON_URL = 'https://status.hyprr.space/index.json'
+const BLUEMAP_URL = 'https://aetheris-map.elysiumjava.ru/'
 
 const panelTitles: Record<Exclude<Panel, null>, string> = {
   map: 'Онлайн-карта',
@@ -108,8 +109,10 @@ function App() {
   const [statusError, setStatusError] = useState(false)
   const [lastUpdated, setLastUpdated] = useState<string | null>(null)
   const [copiedField, setCopiedField] = useState<'java' | 'bedrock-address' | 'bedrock-port' | null>(null)
+  const [mapLoaded, setMapLoaded] = useState(false)
 
   useEffect(() => {
+    if (panel === 'map') setMapLoaded(false)
     if (!panel) return
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -441,7 +444,7 @@ function App() {
       <AnimatePresence>
         {panel && (
           <motion.div
-            className="modal-backdrop"
+            className={panel === 'map' ? 'modal-backdrop modal-backdrop-map' : 'modal-backdrop'}
             role="presentation"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -452,7 +455,13 @@ function App() {
             }}
           >
             <motion.section
-              className={panel === 'connect' ? 'modal modal-connect' : 'modal'}
+              className={
+                panel === 'map'
+                  ? 'modal modal-map'
+                  : panel === 'connect'
+                    ? 'modal modal-connect'
+                    : 'modal'
+              }
               role="dialog"
               aria-modal="true"
               aria-labelledby="modal-title"
@@ -470,56 +479,81 @@ function App() {
                 <X size={20} />
               </button>
 
-              <h2 id="modal-title">{panelTitles[panel]}</h2>
-
-              {panel === 'connect' ? (
-                <div className="connection-content">
-                  <section className="connection-group">
-                    <div className="connection-platform">Java</div>
-                    <button
-                      className="connection-copy connection-copy-wide"
-                      type="button"
-                      onClick={() => void copyConnection('31.177.109.245:15124', 'java')}
-                    >
-                      <span className="connection-value">31.177.109.245:15124</span>
-                      <span className={copiedField === 'java' ? 'copy-state copy-state-active' : 'copy-state'}>
-                        {copiedField === 'java' ? <Check size={16} /> : <Copy size={16} />}
-                        <span>{copiedField === 'java' ? 'Скопировано' : 'Копировать'}</span>
-                      </span>
-                    </button>
-                  </section>
-
-                  <section className="connection-group">
-                    <div className="connection-platform">Bedrock</div>
-                    <div className="connection-grid">
-                      <button
-                        className="connection-copy"
-                        type="button"
-                        onClick={() => void copyConnection('31.177.109.245', 'bedrock-address')}
-                      >
-                        <span className="connection-label">Адрес</span>
-                        <span className="connection-value">31.177.109.245</span>
-                        <span className={copiedField === 'bedrock-address' ? 'copy-icon copy-icon-active' : 'copy-icon'}>
-                          {copiedField === 'bedrock-address' ? <Check size={16} /> : <Copy size={16} />}
-                        </span>
-                      </button>
-
-                      <button
-                        className="connection-copy"
-                        type="button"
-                        onClick={() => void copyConnection('15126', 'bedrock-port')}
-                      >
-                        <span className="connection-label">Порт</span>
-                        <span className="connection-value">15126</span>
-                        <span className={copiedField === 'bedrock-port' ? 'copy-icon copy-icon-active' : 'copy-icon'}>
-                          {copiedField === 'bedrock-port' ? <Check size={16} /> : <Copy size={16} />}
-                        </span>
-                      </button>
-                    </div>
-                  </section>
-                </div>
+              {panel === 'map' ? (
+                <>
+                  <div className="map-modal-header">
+                    <h2 id="modal-title">{panelTitles[panel]}</h2>
+                  </div>
+                  <div className="map-frame-shell">
+                    {!mapLoaded && (
+                      <div className="map-loading" aria-live="polite">
+                        <LoaderCircle size={21} className="status-spin" aria-hidden="true" />
+                        <span>Загрузка карты</span>
+                      </div>
+                    )}
+                    <iframe
+                      className={mapLoaded ? 'map-frame map-frame-loaded' : 'map-frame'}
+                      src={BLUEMAP_URL}
+                      title="Онлайн-карта AEtheris"
+                      onLoad={() => setMapLoaded(true)}
+                      allowFullScreen
+                    />
+                  </div>
+                </>
               ) : (
-                <p>Пока ничего нет</p>
+                <>
+                  <h2 id="modal-title">{panelTitles[panel]}</h2>
+
+                  {panel === 'connect' ? (
+                    <div className="connection-content">
+                      <section className="connection-group">
+                        <div className="connection-platform">Java</div>
+                        <button
+                          className="connection-copy connection-copy-wide"
+                          type="button"
+                          onClick={() => void copyConnection('31.177.109.245:15124', 'java')}
+                        >
+                          <span className="connection-value">31.177.109.245:15124</span>
+                          <span className={copiedField === 'java' ? 'copy-state copy-state-active' : 'copy-state'}>
+                            {copiedField === 'java' ? <Check size={16} /> : <Copy size={16} />}
+                            <span>{copiedField === 'java' ? 'Скопировано' : 'Копировать'}</span>
+                          </span>
+                        </button>
+                      </section>
+
+                      <section className="connection-group">
+                        <div className="connection-platform">Bedrock</div>
+                        <div className="connection-grid">
+                          <button
+                            className="connection-copy"
+                            type="button"
+                            onClick={() => void copyConnection('31.177.109.245', 'bedrock-address')}
+                          >
+                            <span className="connection-label">Адрес</span>
+                            <span className="connection-value">31.177.109.245</span>
+                            <span className={copiedField === 'bedrock-address' ? 'copy-icon copy-icon-active' : 'copy-icon'}>
+                              {copiedField === 'bedrock-address' ? <Check size={16} /> : <Copy size={16} />}
+                            </span>
+                          </button>
+
+                          <button
+                            className="connection-copy"
+                            type="button"
+                            onClick={() => void copyConnection('15126', 'bedrock-port')}
+                          >
+                            <span className="connection-label">Порт</span>
+                            <span className="connection-value">15126</span>
+                            <span className={copiedField === 'bedrock-port' ? 'copy-icon copy-icon-active' : 'copy-icon'}>
+                              {copiedField === 'bedrock-port' ? <Check size={16} /> : <Copy size={16} />}
+                            </span>
+                          </button>
+                        </div>
+                      </section>
+                    </div>
+                  ) : (
+                    <p>Пока ничего нет</p>
+                  )}
+                </>
               )}
             </motion.section>
           </motion.div>
