@@ -5,7 +5,7 @@
     "port": 15124
   },
   "bedrock": {
-    "version": "",
+    "version": "26.30","26.52",
     "address": "31.177.109.245",
     "port": 15126
   }
