@@ -40,8 +40,33 @@ type BetterStackPayload = {
   included?: BetterStackResource[]
 }
 
+type ServerEndpoint = {
+  version: string
+  address: string
+  port: number
+}
+
+type ServerConfig = {
+  java: ServerEndpoint
+  bedrock: ServerEndpoint
+}
+
 const STATUS_JSON_URL = 'https://status.hyprr.space/index.json'
 const BLUEMAP_URL = 'https://aetheris-map.elysiumjava.ru/'
+const SERVER_CONFIG_URL = `${import.meta.env.BASE_URL}server.json`
+
+const DEFAULT_SERVER_CONFIG: ServerConfig = {
+  java: {
+    version: '26.3',
+    address: '31.177.109.245',
+    port: 15124,
+  },
+  bedrock: {
+    version: '',
+    address: '31.177.109.245',
+    port: 15126,
+  },
+}
 
 const panelTitles: Record<Exclude<Panel, null>, string> = {
   map: 'Онлайн-карта',
@@ -110,6 +135,7 @@ function App() {
   const [lastUpdated, setLastUpdated] = useState<string | null>(null)
   const [copiedField, setCopiedField] = useState<'java' | 'bedrock-address' | 'bedrock-port' | null>(null)
   const [mapLoaded, setMapLoaded] = useState(false)
+  const [serverConfig, setServerConfig] = useState<ServerConfig>(DEFAULT_SERVER_CONFIG)
 
   useEffect(() => {
     if (panel === 'map') setMapLoaded(false)
@@ -138,6 +164,39 @@ function App() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [statusOpen])
+
+  useEffect(() => {
+    let active = true
+
+    const loadServerConfig = async () => {
+      try {
+        const response = await fetch(SERVER_CONFIG_URL, { cache: 'no-store' })
+        if (!response.ok) return
+
+        const payload = (await response.json()) as Partial<ServerConfig>
+        if (!active) return
+
+        setServerConfig({
+          java: {
+            ...DEFAULT_SERVER_CONFIG.java,
+            ...payload.java,
+          },
+          bedrock: {
+            ...DEFAULT_SERVER_CONFIG.bedrock,
+            ...payload.bedrock,
+          },
+        })
+      } catch {
+        if (active) setServerConfig(DEFAULT_SERVER_CONFIG)
+      }
+    }
+
+    void loadServerConfig()
+
+    return () => {
+      active = false
+    }
+  }, [])
 
   useEffect(() => {
     let active = true
@@ -507,13 +566,25 @@ function App() {
                   {panel === 'connect' ? (
                     <div className="connection-content">
                       <section className="connection-group">
-                        <div className="connection-platform">Java</div>
+                        <div className="connection-platform-row">
+                          <div className="connection-platform">Java</div>
+                          {serverConfig.java.version && (
+                            <span className="connection-version">{serverConfig.java.version}</span>
+                          )}
+                        </div>
                         <button
                           className="connection-copy connection-copy-wide"
                           type="button"
-                          onClick={() => void copyConnection('31.177.109.245:15124', 'java')}
+                          onClick={() =>
+                            void copyConnection(
+                              `${serverConfig.java.address}:${serverConfig.java.port}`,
+                              'java',
+                            )
+                          }
                         >
-                          <span className="connection-value">31.177.109.245:15124</span>
+                          <span className="connection-value">
+                            {serverConfig.java.address}:{serverConfig.java.port}
+                          </span>
                           <span className={copiedField === 'java' ? 'copy-state copy-state-active' : 'copy-state'}>
                             {copiedField === 'java' ? <Check size={16} /> : <Copy size={16} />}
                             <span>{copiedField === 'java' ? 'Скопировано' : 'Копировать'}</span>
@@ -522,15 +593,22 @@ function App() {
                       </section>
 
                       <section className="connection-group">
-                        <div className="connection-platform">Bedrock</div>
+                        <div className="connection-platform-row">
+                          <div className="connection-platform">Bedrock</div>
+                          {serverConfig.bedrock.version && (
+                            <span className="connection-version">{serverConfig.bedrock.version}</span>
+                          )}
+                        </div>
                         <div className="connection-grid">
                           <button
                             className="connection-copy"
                             type="button"
-                            onClick={() => void copyConnection('31.177.109.245', 'bedrock-address')}
+                            onClick={() =>
+                              void copyConnection(serverConfig.bedrock.address, 'bedrock-address')
+                            }
                           >
                             <span className="connection-label">Адрес</span>
-                            <span className="connection-value">31.177.109.245</span>
+                            <span className="connection-value">{serverConfig.bedrock.address}</span>
                             <span className={copiedField === 'bedrock-address' ? 'copy-icon copy-icon-active' : 'copy-icon'}>
                               {copiedField === 'bedrock-address' ? <Check size={16} /> : <Copy size={16} />}
                             </span>
@@ -539,10 +617,12 @@ function App() {
                           <button
                             className="connection-copy"
                             type="button"
-                            onClick={() => void copyConnection('15126', 'bedrock-port')}
+                            onClick={() =>
+                              void copyConnection(String(serverConfig.bedrock.port), 'bedrock-port')
+                            }
                           >
                             <span className="connection-label">Порт</span>
-                            <span className="connection-value">15126</span>
+                            <span className="connection-value">{serverConfig.bedrock.port}</span>
                             <span className={copiedField === 'bedrock-port' ? 'copy-icon copy-icon-active' : 'copy-icon'}>
                               {copiedField === 'bedrock-port' ? <Check size={16} /> : <Copy size={16} />}
                             </span>
